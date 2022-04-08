@@ -157,7 +157,7 @@ public class AnalythiscEditor : EditorWindow
             {
                 hiddenRenderObject = new GameObject();
                 hiddenRenderObject.name = "AnalythicsObject";
-                //hiddenRenderObject.hideFlags = HideFlags.HideAndDontSave;
+                hiddenRenderObject.hideFlags = HideFlags.HideAndDontSave;
                 hiddenRenderMeshFilter = hiddenRenderObject.AddComponent<MeshFilter>();
                 MeshRenderer r = hiddenRenderObject.AddComponent<MeshRenderer>();
                 r.sharedMaterial = new Material(Shader.Find("Unlit/Anlythics"));
