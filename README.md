@@ -1,5 +1,5 @@
-# VRCAnalythics
-Vrchat analythics
+# VRCanalytics
+Vrchat analytics
 
 lets you visualize the current version of analythics
 
