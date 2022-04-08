@@ -1,4 +1,4 @@
-﻿Shader "Unlit/Anlythics"
+﻿Shader "Unlit/Anlytics"
 {
     Properties
     {

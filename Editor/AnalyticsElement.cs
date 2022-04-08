@@ -6,7 +6,7 @@ using UnityEngine;
 /// The event vrchat sends to us 
 /// </summary>
 [Serializable]
-public class AnalythicsElement
+public class AnalyticsElement
 {
     /// <summary>
     /// ID of the event

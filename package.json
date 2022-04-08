@@ -1,6 +1,6 @@
 {
-    "name":"com.talox.vrcanalythics",
-    "version": "0.0.1",
-    "displayName": "VRC Analythics",
-    "description": "Package to visualize analythics data of VRChat."
+  "name": "com.talox.vrcanalytics",
+  "version": "0.0.2",
+  "displayName": "VRC Analytics",
+  "description": "Package to visualize analytics data of VRChat."
 }

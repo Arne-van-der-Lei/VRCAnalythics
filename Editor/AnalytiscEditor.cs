@@ -5,12 +5,12 @@ using UnityEditor;
 using Newtonsoft.Json;
 using VRC.SDKBase;
 
-public class AnalythiscEditor : EditorWindow
+public class AnalytiscEditor : EditorWindow
 {
     /// <summary>
     /// The textAsset for the analythics
     /// </summary>
-    private TextAsset analythicsFile;
+    private TextAsset analyticsFile;
     /// <summary>
     /// The offset for the Visualization 
     /// </summary>
@@ -19,6 +19,10 @@ public class AnalythiscEditor : EditorWindow
     /// The scaling the visualization needs to use
     /// </summary>
     private Vector3 scale = Vector3.one;
+    /// <summary>
+    /// The lower treshold bounds in %
+    /// </summary>
+    private float lowerTreshold = 0.01f;
 
     /// <summary>
     /// The list of processed elements 
@@ -56,10 +60,10 @@ public class AnalythiscEditor : EditorWindow
     /// <summary>
     /// Initilization of the analythics
     /// </summary>
-    [MenuItem("Analythics/Analythics")]
+    [MenuItem("Analytics/Analytics")]
     static void Init()
     {
-        AnalythiscEditor window = (AnalythiscEditor)EditorWindow.GetWindow(typeof(AnalythiscEditor));
+        AnalytiscEditor window = (AnalytiscEditor)EditorWindow.GetWindow(typeof(AnalytiscEditor));
         window.Show();
     }
 
@@ -69,16 +73,17 @@ public class AnalythiscEditor : EditorWindow
     void OnGUI()
     {
         GUILayout.Label("Base Settings", EditorStyles.boldLabel);
-        analythicsFile = (TextAsset)EditorGUILayout.ObjectField("Analythics file",analythicsFile,typeof(TextAsset),false);
+        analyticsFile = (TextAsset)EditorGUILayout.ObjectField("Analytics file",analyticsFile,typeof(TextAsset),false);
         offset = EditorGUILayout.Vector3Field("Offset", offset);
         scale = EditorGUILayout.Vector3Field("Scale", scale);
+        lowerTreshold = EditorGUILayout.FloatField("treshold", lowerTreshold);
 
 
-        if (analythicsFile == null) return;
+        if (analyticsFile == null) return;
 
         if (GUILayout.Button("Read data"))
         {
-            AnalythicsElement[] AnaElements = JsonConvert.DeserializeObject<AnalythicsElement[]>(analythicsFile.text);
+            AnalyticsElement[] AnaElements = JsonConvert.DeserializeObject<AnalyticsElement[]>(analyticsFile.text);
             elements.Clear();
             maxAmount = 0;
 
@@ -117,6 +122,7 @@ public class AnalythiscEditor : EditorWindow
             for(int i = 0; i < elements.Count; i++)
             {
                 float amount = (float)elements[i].amount / maxAmount;
+                if (amount <= lowerTreshold) continue;
                 Mesh mesh = new Mesh();
 
                 Vector2[] uvs = cubemesh.uv;
@@ -151,16 +157,16 @@ public class AnalythiscEditor : EditorWindow
     {
         if (!Utilities.IsValid(hiddenRenderObject))
         {
-            hiddenRenderObject = GameObject.Find("AnalythicsObject");
+            hiddenRenderObject = GameObject.Find("AnalyticsObject");
 
             if (!Utilities.IsValid(hiddenRenderObject))
             {
                 hiddenRenderObject = new GameObject();
-                hiddenRenderObject.name = "AnalythicsObject";
+                hiddenRenderObject.name = "AnalyticsObject";
                 hiddenRenderObject.hideFlags = HideFlags.HideAndDontSave;
                 hiddenRenderMeshFilter = hiddenRenderObject.AddComponent<MeshFilter>();
                 MeshRenderer r = hiddenRenderObject.AddComponent<MeshRenderer>();
-                r.sharedMaterial = new Material(Shader.Find("Unlit/Anlythics"));
+                r.sharedMaterial = new Material(Shader.Find("Unlit/Anlytics"));
             }
             hiddenRenderObject.SetActive(false);
         }
