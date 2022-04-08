@@ -1,0 +1,6 @@
+{
+    "name":"com.talox.vrcanalythics",
+    "version": "0.0.1",
+    "displayName": "VRC Analythics",
+    "description": "Package to visualize analythics data of VRChat."
+}
