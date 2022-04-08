@@ -117,9 +117,21 @@ public class AnalythiscEditor : EditorWindow
             for(int i = 0; i < elements.Count; i++)
             {
                 float amount = (float)elements[i].amount / maxAmount;
+                Mesh mesh = new Mesh();
+
+                Vector2[] uvs = cubemesh.uv;
+
+                for(int j = 0; j < uvs.Length; j++)
+                {
+                    uvs[j] = new Vector2(amount, 0);
+                }
+                mesh.vertices = cubemesh.vertices;
+                mesh.triangles = cubemesh.triangles;
+                mesh.uv = uvs;
+
                 instances.Add(new CombineInstance
                 {
-                    mesh = cubemesh,
+                    mesh = mesh,
                     transform = Matrix4x4.Translate(Vector3.Scale(elements[i].pos, scale) + offset + Vector3.up * scale.y * 0.5f * amount) * Matrix4x4.Scale(new Vector3(0.5f * scale.x, amount * scale.y, 0.5f * scale.z)),
                     subMeshIndex = 0
                 });
@@ -145,10 +157,10 @@ public class AnalythiscEditor : EditorWindow
             {
                 hiddenRenderObject = new GameObject();
                 hiddenRenderObject.name = "AnalythicsObject";
-                hiddenRenderObject.hideFlags = HideFlags.HideAndDontSave;
+                //hiddenRenderObject.hideFlags = HideFlags.HideAndDontSave;
                 hiddenRenderMeshFilter = hiddenRenderObject.AddComponent<MeshFilter>();
                 MeshRenderer r = hiddenRenderObject.AddComponent<MeshRenderer>();
-                r.sharedMaterial = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Diffuse.mat");
+                r.sharedMaterial = new Material(Shader.Find("Unlit/Anlythics"));
             }
             hiddenRenderObject.SetActive(false);
         }
