@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using Newtonsoft.Json;
 using VRC.SDKBase;
+using System;
 
 public class AnalytiscEditor : EditorWindow
 {
@@ -23,6 +24,9 @@ public class AnalytiscEditor : EditorWindow
     /// The lower treshold bounds in %
     /// </summary>
     private float lowerTreshold = 0.01f;
+
+    private DateTime BeginTime = DateTime.MinValue;
+    private DateTime EndTime = DateTime.Now;
 
     /// <summary>
     /// The list of processed elements 
@@ -77,7 +81,8 @@ public class AnalytiscEditor : EditorWindow
         offset = EditorGUILayout.Vector3Field("Offset", offset);
         scale = EditorGUILayout.Vector3Field("Scale", scale);
         lowerTreshold = EditorGUILayout.FloatField("treshold", lowerTreshold);
-
+        BeginTime = RenderTimeGui("BeginTime",BeginTime);
+        EndTime = RenderTimeGui("EndTime",EndTime);
 
         if (analyticsFile == null) return;
 
@@ -101,6 +106,9 @@ public class AnalytiscEditor : EditorWindow
 
             for (int i = 0; i < AnaElements.Length; i++)
             {
+                DateTime timestamp = AnaElements[i].timestamp;
+                if (timestamp < BeginTime || timestamp > EndTime) continue;
+
                 Vector3Int internalPos = Vector3Int.RoundToInt(Vector3.Scale(AnaElements[i].position ,new Vector3(1/scale.x, 1 / scale.y, 1 / scale.z)) - offset);
                 int index = elements.FindIndex((o) => o.pos == internalPos);
                 if (index == -1)
@@ -148,6 +156,35 @@ public class AnalytiscEditor : EditorWindow
 
             hiddenRenderObject.SetActive(true);
         }
+    }
+
+    private DateTime RenderTimeGui(string text,DateTime time)
+    {
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.PrefixLabel(text);
+        int D = EditorGUILayout.IntField( time.Day, GUILayout.Width(20));
+        EditorGUILayout.LabelField("/",GUILayout.Width(10));
+        int M = EditorGUILayout.IntField( time.Month, GUILayout.Width(20));
+        EditorGUILayout.LabelField("/", GUILayout.Width(10));
+        int Y = EditorGUILayout.IntField( time.Year, GUILayout.Width(40));
+        EditorGUILayout.LabelField(" ", GUILayout.Width(10));
+
+        int H = EditorGUILayout.IntField( time.Hour, GUILayout.Width(20));
+        EditorGUILayout.LabelField(":", GUILayout.Width(10));
+        int m = EditorGUILayout.IntField( time.Minute, GUILayout.Width(20));
+        EditorGUILayout.LabelField(":", GUILayout.Width(10));
+        int S = EditorGUILayout.IntField( time.Second, GUILayout.Width(20));
+        EditorGUILayout.EndHorizontal();
+        DateTime outp;
+        try
+        {
+            outp = new DateTime(Y, M, D, H, m, S);
+        }
+        catch (Exception e)
+        {
+            return time;
+        }
+        return outp;
     }
 
     /// <summary>
