@@ -24,9 +24,19 @@ public class AnalytiscEditor : EditorWindow
     /// The lower treshold bounds in %
     /// </summary>
     private float lowerTreshold = 0.01f;
-
+    /// <summary>
+    /// Begin time of the visualization
+    /// </summary>
     private DateTime BeginTime = DateTime.MinValue;
+    /// <summary>
+    /// End time of the visualization
+    /// </summary>
     private DateTime EndTime = DateTime.Now;
+
+    /// <summary>
+    /// The animation curve for the events;
+    /// </summary>
+    private AnimationCurve Curve = new AnimationCurve();
 
     /// <summary>
     /// The list of processed elements 
@@ -80,7 +90,7 @@ public class AnalytiscEditor : EditorWindow
         analyticsFile = (TextAsset)EditorGUILayout.ObjectField("Analytics file",analyticsFile,typeof(TextAsset),false);
         offset = EditorGUILayout.Vector3Field("Offset", offset);
         scale = EditorGUILayout.Vector3Field("Scale", scale);
-        lowerTreshold = EditorGUILayout.FloatField("treshold", lowerTreshold);
+        lowerTreshold = EditorGUILayout.FloatField("Treshold", lowerTreshold);
         BeginTime = RenderTimeGui("BeginTime",BeginTime);
         EndTime = RenderTimeGui("EndTime",EndTime);
 
@@ -92,6 +102,9 @@ public class AnalytiscEditor : EditorWindow
             elements.Clear();
             maxAmount = 0;
 
+            List<Vector2Int> dataTiming = new List<Vector2Int>();
+            Curve = new AnimationCurve();
+
             Mesh cubemesh = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
             List<CombineInstance> instances = new List<CombineInstance>();
             Mesh combineMesh = hiddenRenderMeshFilter.sharedMesh;
@@ -102,12 +115,23 @@ public class AnalytiscEditor : EditorWindow
             }
             combineMesh.Clear();
 
-            
-
             for (int i = 0; i < AnaElements.Length; i++)
             {
                 DateTime timestamp = AnaElements[i].timestamp;
                 if (timestamp < BeginTime || timestamp > EndTime) continue;
+
+                int timing = Mathf.FloorToInt((float)timestamp.Subtract(BeginTime).TotalHours);
+                int indexDataTiming = dataTiming.FindIndex((v) => v.x == timing);
+                if(indexDataTiming == -1)
+                {
+                    dataTiming.Add(new Vector2Int(timing, 1));
+                }
+                else
+                {
+                    Vector2Int data = dataTiming[indexDataTiming];
+                    data.y++;
+                    dataTiming[indexDataTiming] = data;
+                }
 
                 Vector3Int internalPos = Vector3Int.RoundToInt(Vector3.Scale(AnaElements[i].position ,new Vector3(1/scale.x, 1 / scale.y, 1 / scale.z)) - offset);
                 int index = elements.FindIndex((o) => o.pos == internalPos);
@@ -117,6 +141,7 @@ public class AnalytiscEditor : EditorWindow
                 }
                 else
                 {
+
                     Data data = elements[index];
                     data.amount++;
 
@@ -154,10 +179,24 @@ public class AnalytiscEditor : EditorWindow
             combineMesh.CombineMeshes(instances.ToArray());
             hiddenRenderMeshFilter.sharedMesh = combineMesh;
 
+
+            for(int i= 0; i< dataTiming.Count; i++)
+            {
+                Curve.AddKey(new Keyframe(dataTiming[i].x, dataTiming[i].y));
+            }
+
             hiddenRenderObject.SetActive(true);
         }
+
+        Curve = EditorGUILayout.CurveField("the curve", Curve);
     }
 
+    /// <summary>
+    /// Shows a Time select field
+    /// </summary>
+    /// <param name="text">The display text</param>
+    /// <param name="time">the time to change</param>
+    /// <returns></returns>
     private DateTime RenderTimeGui(string text,DateTime time)
     {
         EditorGUILayout.BeginHorizontal();
