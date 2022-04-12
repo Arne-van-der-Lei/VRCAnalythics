@@ -5,6 +5,7 @@ using UnityEditor;
 using Newtonsoft.Json;
 using VRC.SDKBase;
 using System;
+using UnityEngine.Rendering;
 
 public class AnalytiscEditor : EditorWindow
 {
@@ -112,6 +113,7 @@ public class AnalytiscEditor : EditorWindow
             if(combineMesh == null)
             {
                 combineMesh = new Mesh();
+                combineMesh.indexFormat = IndexFormat.UInt32;
             }
             combineMesh.Clear();
 
@@ -157,6 +159,7 @@ public class AnalytiscEditor : EditorWindow
                 float amount = (float)elements[i].amount / maxAmount;
                 if (amount <= lowerTreshold) continue;
                 Mesh mesh = new Mesh();
+                mesh.indexFormat = IndexFormat.UInt32;
 
                 Vector2[] uvs = cubemesh.uv;
 
